@@ -12,7 +12,7 @@ const getDoctors = async (req, res) => {
 
 // Get a single workout
 const getDoctor = async (req, res) => {
-    const {id} = req.params.id
+    const {id} = req.params
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
         return res.status(404).json({error: 'No such doctor'})
@@ -29,13 +29,59 @@ const getDoctor = async (req, res) => {
 
 // Create a doctor
 const createDoctor = async (req, res) => {
+    const user_id = req.user._id;
+
+    let emptyFields = [];
+
+    if (!req.body.name) {
+        emptyFields.push('fullname');
+    }
+    if (!req.body.email) {
+        emptyFields.push('email');
+    }
+    if (!req.body.phone) {
+        emptyFields.push('phone');
+    }
+    if (!req.body.address) {
+        emptyFields.push('address');
+    }
+    if (!req.body.specialty) {
+        emptyFields.push('specialty');
+    }
+
+    if (emptyFields.length > 0) {
+        return res.status(400).json({ error: 'Please fill in all the fields', emptyFields });
+    }
+
     const doctor = new Doctor({
         fullname: req.body.name,
         email: req.body.email,
         phone: req.body.phone,
         address: req.body.address,
         specialty: req.body.specialty,
-      });
+        user_id
+    });
+
+    try {
+        const newDoctor = await doctor.save();
+        res.status(200).json(newDoctor);
+    } catch (error) {
+        res.status(400).json({ error: error.message });
+    }
+}
+
+
+
+// const createDoctor = async (req, res) => {
+//     const user_id = req.user._id;
+//     const doctor = new Doctor({
+//         fullname: req.body.name,
+//         email: req.body.email,
+//         phone: req.body.phone,
+//         address: req.body.address,
+//         specialty: req.body.specialty,
+//         user_id
+//       });
 
 //     let emptyFields = []
 
@@ -63,14 +109,14 @@ const createDoctor = async (req, res) => {
 // }
 
     // add doc to db
-    try {
+    // try {
         // const user_id = req.user._id
-        const newDoctor = await doctor.save()
-        res.status(200).json(newDoctor);
-    } catch (error) {
-        res.status(400).json({error: error.message})
-    }
-}
+//         const newDoctor = await doctor.save()
+//         res.status(200).json(newDoctor);
+//     } catch (error) {
+//         res.status(400).json({error: error.message})
+//     }
+// }
 
 // Delete a doctor
 const deleteDoctor = async (req, res) => {
@@ -87,7 +133,7 @@ const deleteDoctor = async (req, res) => {
 
 // Update a doctor
 const updateDoctor = async (req, res) => {
-    const {id} = req.params.id
+    const {id} = req.params
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
         return res.status(404).json({error: 'No such doctor'})
