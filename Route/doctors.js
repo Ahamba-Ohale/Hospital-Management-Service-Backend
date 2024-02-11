@@ -1,4 +1,4 @@
-const express = require('express')
+const express = require('express');
 const {
     createDoctor,
     getDoctors,
@@ -6,6 +6,14 @@ const {
     deleteDoctor,
     updateDoctor
 } = require('../controller/admin/DoctorController')
+
+// Middleware to check for authentication
+// const isAuthenticated = (req, res, next) => {
+//     if (req.isAuthenticated()) {
+//       return next();
+//     }
+//     res.status(401).json({ error: 'Unauthorized' });
+//   };
 
 const router = express.Router()
 

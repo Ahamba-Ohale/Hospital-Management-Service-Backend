@@ -12,10 +12,6 @@ const doctorSchema = new Schema({
         required: true,
         unique:true 
     },
-    password: {
-        type: String,
-        required: true
-    },
     address: {
         type: String,
         required: true
@@ -26,10 +22,6 @@ const doctorSchema = new Schema({
     },
     specialty: {
         type: String,
-        required: true
-    },
-    user_id: {
-        type: mongoose.Schema.Types.ObjectId,
         required: true
     }
 }, { timestamps: true });

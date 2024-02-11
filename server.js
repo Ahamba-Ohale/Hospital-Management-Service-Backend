@@ -1,15 +1,22 @@
 require('dotenv').config()
 
 const express = require('express')
-const cors = require('cors');
+// const cors = require('cors');
 const mongoose = require('mongoose')
-const doctorRoutes = require('./Route/doctors')
+const doctorRoutes = require('./route/doctors')
 
 // express App
 const app = express()
 
 app.use(express.json());
-app.use(cors());
+// app.use(cors());
+
+// middleware
+app.use(express.json()) // parse incoming requests with JSON payloads and return responses in JSON format</s>
+app.use((req, res, next) => {
+    console.log(req.path, req.method)
+    next()
+})
 
 // routes
 app.use('/api/doctors', doctorRoutes)
