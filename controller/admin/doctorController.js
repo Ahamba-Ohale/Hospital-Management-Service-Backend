@@ -1,4 +1,4 @@
-const Doctor = require('../../models/doctorModels');
+const Doctor = require('../../models/admin/doctorModels');
 const mongoose = require('mongoose');
 
 // Get all doctors

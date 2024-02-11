@@ -3,7 +3,8 @@ require('dotenv').config()
 const express = require('express')
 // const cors = require('cors');
 const mongoose = require('mongoose')
-const doctorRoutes = require('./route/doctors')
+const doctorRoutes = require('./route/admin/doctors')
+const departmentRoutes = require('./route/admin/departments')
 
 // express App
 const app = express()
@@ -20,6 +21,7 @@ app.use((req, res, next) => {
 
 // routes
 app.use('/api/doctors', doctorRoutes)
+app.use('/api/departments', departmentRoutes)
 
 
 //connect to db
