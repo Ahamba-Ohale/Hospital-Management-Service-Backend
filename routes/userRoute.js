@@ -1,28 +1,35 @@
-// Import the necessary modules
 const express = require("express");
 const router = express.Router();
-const userController = require("../controllers/userController");
-const userMiddleware = require("../middlewares/userMiddleware");
+const {
+  authenticateUser,
+  authorizeUser,
+} = require("../middlewares/auth");
+const {
+  register,
+  verifyOTP,
+  login,
+  logout,
+  uploadProfileImage,
+  deleteProfileImage,
+  validate,
+  addNote,
+  deleteNote,
+} = require("../controllers/userController");
 
-// Register a new user
-router.post(
-    "/register",
-    userMiddleware.authenticateUser,
-    userController.registerWithCaptcha
-);
+router.post("/register", register);
+router.post("/verify-otp", verifyOTP);
+router.post("/login", login);
 
-// Log in a user
-router.post(
-    "/login",
-    userMiddleware.authorizeUser,
-    userController.verifyUser
-);
+router.use(authenticateUser);
+router.get("/profile", authorizeUser("user"), (req, res) => {
+  res.status(200).json({ message: "Welcome to your profile", user: req.user });
+});
 
-// Logout a user
-router.get(
-    '/logout', 
-    userController.logout
-);
+router.post("/upload-profile-image/:id", uploadProfileImage);
+router.post("/delete-profile-image/:id", deleteProfileImage);
+router.post("/validate/:id", validate);
 
-// Export the router as a module
+router.post("/add-note/:id", addNote);
+router.post("/delete-note/:id/:noteId", deleteNote);
+
 module.exports = router;
