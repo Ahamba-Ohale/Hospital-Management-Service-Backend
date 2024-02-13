@@ -1,13 +1,18 @@
 const express = require('express');
 const router = express.Router();
-const articleController = require('../controllers/articleController');
 
-router.post('/', articleController.createArticle);
-router.get('/', articleController.getArticles);
-router.get('/:id', articleController.getArticle);
-router.put('/:id', articleController.updateArticle);
-router.delete('/:id', articleController.deleteArticle);
+const {
+    createArticle, 
+    getArticles, 
+    getArticle, 
+    updatePost, 
+    deletePost
+} = require('../controllers/articleController');
+
+router.post('/', createArticle);
+router.get('/', getArticles);
+router.get('/:id', getArticle);
+router.put('/:id', updatePost);
+router.delete('/:id', deletePost);
 
 module.exports = router;
-
-// **middlewares/auth.js**
