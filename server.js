@@ -1,19 +1,25 @@
-require('dotenv').config()
+require('dotenv').config();
 
-const express = require('express')
-// const cors = require('cors');
-const mongoose = require('mongoose')
 const doctorRoutes = require('./route/admin/doctors')
 const departmentRoutes = require('./route/admin/departments')
 const patientRoutes = require('./route/admin/patients')
 const nurseRoutes = require('./route/admin/nurses')
 const pharmacyRoutes = require('./route/admin/pharmacy')
+const express = require('express');
+const cors = require('cors');
+const mongoose = require('mongoose');
+const bodyParser = require('body-parser')
+const router = require('./routes/paymentRoute');
+const paystack = require('paystack')(process.env.PAYSTACK_SECRET_KEY);
 
 // express App
-const app = express()
+const app = express();
 
 app.use(express.json());
-// app.use(cors());
+
+app.use(cors());
+app.use(bodyParser.json()); // to support JSON-encoded bodies
+app.use(router);
 
 // middleware
 app.use(express.json()) // parse incoming requests with JSON payloads and return responses in JSON format</s>
