@@ -54,7 +54,7 @@ const UserSchema = new Schema({
     validate: {
       validator: function(value) {
         // Check if the contact is a valid phone number
-        const phoneRegex = /^(+\d{1,3}\s?)?(((\d{3})|\d{3}))[\s.-]?\d{3}[\s.-]?\d{4}$/;
+        const phoneRegex = /(?:\+?(\d{1,4}?)[-\s.]?)?((\d{3})|\d{3})[-.\s]?\d{3}[-.\s]?\d{4}/g;
         return phoneRegex.test(value);
       },
       message: 'Contact must be a valid phone number in the format XXX-XXX-XXXX or XXX.XXX.XXXX or XXX XXX XXXX or +XX XXX XXX XXXX',
@@ -76,7 +76,7 @@ const UserSchema = new Schema({
       },
       zip: {
         type: String,
-        required: true,
+        required: false,
       },
     },
     required: true,

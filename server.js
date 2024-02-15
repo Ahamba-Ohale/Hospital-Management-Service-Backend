@@ -9,6 +9,7 @@ const departmentRoutes = require('./route/admin/departments')
 const patientRoutes = require('./route/admin/patients')
 const nurseRoutes = require('./route/admin/nurses')
 const pharmacyRoutes = require('./route/admin/pharmacy')
+const uploadRoutes = require('./routes/uploadRoute')
 const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
@@ -42,10 +43,14 @@ app.use('/api/patients', patientRoutes)
 app.use('/api/nurses', nurseRoutes)
 app.use('/api/pharmacy', pharmacyRoutes)
 app.use('/api/users', userRoute)
+app.use('/api/uploadRoute', uploadRoutes)
 
 
 //connect to db
-mongoose.connect(process.env.MONGO_URI)
+mongoose.connect(process.env.MONGO_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
     .then(() => {
         // listen for request
         app.listen(process.env.PORT || 5000, () => {

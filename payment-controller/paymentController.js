@@ -1,6 +1,8 @@
 require('dotenv').config();
+
 const express = require('express');
 const https = require('https');
+const Payment = require('../models/paymentModel');
 
 const payStack = {
 
