@@ -1,6 +1,6 @@
 require('dotenv').config();
 
-const doctorRoutes = require('./route/admin/doctors')
+const doctorRoutes = require('./Route/admin/doctors')
 const departmentRoutes = require('./route/admin/departments')
 const patientRoutes = require('./route/admin/patients')
 const nurseRoutes = require('./route/admin/nurses')
@@ -27,6 +27,7 @@ app.use((req, res, next) => {
     console.log(req.path, req.method)
     next()
 })
+
 
 // routes
 app.use('/api/doctors', doctorRoutes)
