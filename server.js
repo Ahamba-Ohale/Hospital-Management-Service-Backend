@@ -5,12 +5,11 @@ const departmentRoutes = require('./route/admin/departments')
 const patientRoutes = require('./route/admin/patients')
 const nurseRoutes = require('./route/admin/nurses')
 const pharmacyRoutes = require('./route/admin/pharmacy')
+const appointmentRoutes = require('./Route/appointment')
 const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser')
-const router = require('./routes/paymentRoute');
-const paystack = require('paystack')(process.env.PAYSTACK_SECRET_KEY);
 
 // express App
 const app = express();
@@ -19,7 +18,6 @@ app.use(express.json());
 
 app.use(cors());
 app.use(bodyParser.json()); // to support JSON-encoded bodies
-app.use(router);
 
 // middleware
 app.use(express.json()) // parse incoming requests with JSON payloads and return responses in JSON format</s>
@@ -35,6 +33,7 @@ app.use('/api/departments', departmentRoutes)
 app.use('/api/patients', patientRoutes)
 app.use('/api/nurses', nurseRoutes)
 app.use('/api/pharmacy', pharmacyRoutes)
+app.use('/api/appointment', appointmentRoutes)
 
 //connect to db
 mongoose.connect(process.env.MONGO_URI)
