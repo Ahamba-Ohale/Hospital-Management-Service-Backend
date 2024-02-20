@@ -29,7 +29,6 @@ const userSchema = new mongoose.Schema({
     validate: {
       validator: function (value) {
         // Custom email validation logic
-        // You can use external libraries like validator.js for more robust email validation
         return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
       },
       message: 'Invalid email format',
@@ -60,6 +59,10 @@ const userSchema = new mongoose.Schema({
   },
   address: {
     type: {
+      country: {
+        type: String,
+        required: [true, 'Country is required'],
+      },
       street: {
         type: String,
         required: [true, 'Street is required'],
@@ -82,7 +85,7 @@ const userSchema = new mongoose.Schema({
         },
       },
     },
-    required: [true, 'Address is required and must include street, city, and state'],
+    required: [true, 'Address is required and must include country, street, city, and state'],
   },
   isVerified: {
     type: Boolean,

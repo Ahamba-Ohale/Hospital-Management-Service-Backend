@@ -28,8 +28,20 @@ exports.registerUser = async (req, res) => {
     // Set isVerified to true when generating the verification code
     newUser.isVerified = true;
 
-    // Generate a random verification code for the user
-    newUser.verificationCode = crypto.randomBytes(6).toString("hex");
+    // Check if the verification code is expired
+    if (newUser.verificationCodeExpiry && newUser.verificationCodeExpiry < new Date()) {
+      // Generate a new verification code
+      newUser.verificationCode = crypto.randomBytes(6).toString("hex");
+      // Set a new expiration time (e.g., 1 hour from now)
+      newUser.verificationCodeExpiry = new Date();
+      newUser.verificationCodeExpiry.setHours(newUser.verificationCodeExpiry.getHours() + 1);
+    } else {
+      // Generate a verification code for the user
+      newUser.verificationCode = crypto.randomBytes(6).toString("hex");
+      // Set the expiration time (e.g., 1 hour from now)
+      newUser.verificationCodeExpiry = new Date();
+      newUser.verificationCodeExpiry.setHours(newUser.verificationCodeExpiry.getHours() + 1);
+    }
 
     // Save the user, including the default values for the verification code
     await newUser.save();
@@ -47,16 +59,21 @@ const sendVerificationEmail = async (user) => {
   const transporter = nodemailer.createTransport({
     service: "gmail",
     auth: { 
-      user: "your-email@gmail.com", 
-      pass: "your-email-password" 
+      user: process.env.EMAIL, 
+      pass: process.env.EMAIL_PASS 
     },
   });
 
   const mailOptions = {
-    from: "your-email@gmail.com",
+    from: process.env.EMAIL,
     to: user.email,
     subject: "Verify your email",
-    text: `Your verification code is ${user.verificationCode}`,
+    html: `
+      <p>Thank you for registering! Please verify your email by clicking the link below:</p>
+      <a href="${process.env.BASE_URL}/verify?userId=${user._id}&verificationCode=${user.verificationCode}">
+        Verify Email
+      </a>
+    `,
   };
 
   await transporter.sendMail(mailOptions);
@@ -67,13 +84,13 @@ exports.loginUser = async (req, res) => {
     const user = await User.findOne({ email: req.body.email });
 
     if (!user) {
-      return res.status(400).json({ email: "Invalid email or password" });
+      return res.status(400).json({ email: "Invalid email" });
     }
 
     const isPasswordValid = await bcrypt.compare(req.body.password, user.password);
 
     if (!isPasswordValid) {
-      return res.status(400).json({ password: "Invalid email or password" });
+      return res.status(400).json({ password: "Invalid password" });
     }
 
     if (!user.isVerified) {
@@ -97,13 +114,24 @@ exports.verifyUser = async (req, res) => {
       return res.status(400).json({ message: "Invalid user ID" });
     }
 
-    if (user.verificationCode !== verificationCode) {
+    if (user.isVerified) {
+      return res.status(400).json({ message: "User is already verified" });
+    }
+
+    if (!user.verificationCode || user.verificationCode !== verificationCode) {
       return res.status(400).json({ message: "Invalid verification code" });
     }
 
+    // Check if the verification code has expired (assuming verificationCodeExpiry is a Date)
+    if (user.verificationCodeExpiry && user.verificationCodeExpiry < new Date()) {
+      return res.status(400).json({ message: "Verification code has expired" });
+    }
+
+    // Mark the user as verified and clear verification-related fields
     user.isVerified = true;
     user.verificationCode = null;
     user.verificationCodeExpiry = null;
+
     await user.save();
 
     return res.status(200).json({ message: "User verified successfully" });
@@ -184,7 +212,7 @@ const sendPasswordResetEmail = async (user, resetToken) => {
   });
 
   const mailOptions = {
-    from: "your-email@gmail.com",
+    from: process.env.EMAIL,
     to: user.email,
     subject: "Reset your password",
     text: `Your password reset token is ${resetToken}`,
