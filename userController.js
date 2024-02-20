@@ -114,10 +114,12 @@ exports.verifyUser = async (req, res) => {
       return res.status(400).json({ message: "Invalid user ID" });
     }
 
+    // Check if the user is already verified
     if (user.isVerified) {
       return res.status(400).json({ message: "User is already verified" });
     }
 
+    // Check if the verification code is missing or incorrect
     if (!user.verificationCode || user.verificationCode !== verificationCode) {
       return res.status(400).json({ message: "Invalid verification code" });
     }
@@ -156,14 +158,18 @@ exports.forgotPassword = async (req, res) => {
       return res.status(400).json({ email: "Email not found" });
     }
 
-    user.passwordResetToken = crypto.randomBytes(32).toString("hex");
+    // Generate a more secure random password reset token
+    const secureRandomToken = crypto.randomBytes(32).toString("hex");
+
+    user.passwordResetToken = secureRandomToken;
     user.passwordResetTokenExpiry = new Date();
     user.passwordResetTokenExpiry.setHours(
       user.passwordResetTokenExpiry.getHours() + 1
     );
     await user.save();
 
-    await sendPasswordResetEmail(user, user.passwordResetToken);
+    // Send the email with the more secure token
+    await sendPasswordResetEmail(user, secureRandomToken);
 
     return res.status(200).json(user);
   } catch (err) {
