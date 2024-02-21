@@ -6,10 +6,11 @@ const patientRoutes = require('./route/admin/patients')
 const nurseRoutes = require('./route/admin/nurses')
 const pharmacyRoutes = require('./route/admin/pharmacy')
 const appointmentRoutes = require('./Route/appointment')
+const medicalHistoryRoutes = require('./Route/admin/medicalHistory')
 const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
-const bodyParser = require('body-parser')
+
 
 // express App
 const app = express();
@@ -17,7 +18,6 @@ const app = express();
 app.use(express.json());
 
 app.use(cors());
-app.use(bodyParser.json()); // to support JSON-encoded bodies
 
 // middleware
 app.use(express.json()) // parse incoming requests with JSON payloads and return responses in JSON format</s>
@@ -34,6 +34,7 @@ app.use('/api/patients', patientRoutes)
 app.use('/api/nurses', nurseRoutes)
 app.use('/api/pharmacy', pharmacyRoutes)
 app.use('/api/appointment', appointmentRoutes)
+app.use('/api/medicalHistory', medicalHistoryRoutes)
 
 //connect to db
 mongoose.connect(process.env.MONGO_URI)

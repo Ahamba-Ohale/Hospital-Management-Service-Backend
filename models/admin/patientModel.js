@@ -3,42 +3,46 @@ const mongoose = require('mongoose')
 const Schema = mongoose.Schema
 
 const patientSchema = new Schema({
-    name: {
+    firstName: {
         type: String,
         required: true
     },
-    email: {
+    lastName: {
         type: String,
-        required: true,
+        required: true
     },
-    address: {
-        type: String,
-        required: true,
-    },
-    phone: {
-        type: String,
-        required: true,
-    },
-    sex: {
-        type: String,
-        required: true,
-    },
-    dob: {
-        type: String,
-        required: true,
-    },
-    age: {
-        type: String,
-        required: true,
-    },
-    blood: {
+    contactInformation: {
+        email: { 
+            type: String, 
+            required: true },
+        phoneNumber: { 
+            type: String, 
+            required: true },
+        address: { type: String },
+      },
+    bloodType: {
         type: String,
         required: true,
     },
     genotype: {
         type: String,
-        required: true,
-    }
+        required: false,
+    },
+    demographicDetails: {
+        dateOfBirth: { 
+            type: Date, 
+            required: true 
+        },
+        gender: { 
+            type: String, 
+            enum: ['Male', 'Female', 'Other'], 
+            required: true 
+        },
+      },
+      insuranceInformation: {
+        provider: { type: String },
+        policyNumber: { type: String },
+      }
 }, { timestamps: true });
 
 module.exports = mongoose.model('Patient', patientSchema)

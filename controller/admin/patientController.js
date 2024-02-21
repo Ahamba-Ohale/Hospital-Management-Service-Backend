@@ -53,11 +53,28 @@ const  createPatient = async (req, res) => {
     //     return res.status(400).json({ error: 'Please fill in all the fields', emptyFields });
     // }
 
-    const {name, email, address, phone, sex, dob, age, blood, genotype} = req.body
-
+    const {
+        firstName,
+        lastName,
+        contactInformation: { email, phoneNumber, address },
+        bloodType,
+        genoType,
+        demographicDetails: { dateOfBirth, gender },
+        insuranceInformation: { provider, policyNumber },
+      } = req.body;
+    
     // Add patient to db
     try {
-        const patient = await Patient.create({name, email, address, phone, sex, dob, age, blood, genotype});
+        const patient = await Patient.create({
+            firstName,
+            lastName,
+            contactInformation: { email, phoneNumber, address },
+            bloodType,
+            genoType,
+            demographicDetails: { dateOfBirth, gender },
+            insuranceInformation: { provider, policyNumber },
+          }
+        );
         res.status(200).json(patient);
     } catch (error) {
        
