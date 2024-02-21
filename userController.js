@@ -2,8 +2,8 @@ require('dotenv').config();
 
 const crypto = require("crypto");
 const nodemailer = require("nodemailer");
-const bcrypt = require("bcrypt");
-const User = require("../models/userModel");
+const bcrypt = require("bcryptjs");
+const User = require("./userModel");
 
 exports.registerUser = async (req, res) => {
   try {

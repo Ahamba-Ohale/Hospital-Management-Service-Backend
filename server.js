@@ -1,7 +1,6 @@
 require('dotenv').config();
 
 
-const userRoute = require("./routes/userRoute")
 const cookieParser = require('cookie-parser');
 const articleRoute = require('./routes/articleRoutes');
 const doctorRoutes = require('./route/admin/doctors')
@@ -9,7 +8,6 @@ const departmentRoutes = require('./route/admin/departments')
 const patientRoutes = require('./route/admin/patients')
 const nurseRoutes = require('./route/admin/nurses')
 const pharmacyRoutes = require('./route/admin/pharmacy')
-const uploadRoutes = require('./routes/uploadRoute')
 const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
@@ -18,9 +16,9 @@ const router = require('./routes/paymentRoute');
 const paystack = require('paystack')(process.env.PAYSTACK_SECRET_KEY);
 
 
-const bodyParser = require('body-parser')
+// const bodyParser = require('body-parser')
 // const paystack = require('paystack')(process.env.PAYSTACK_SECRET_KEY);
-const userRoutes = require('./routes/userRoute');
+const userRoutes = require('./userRoute');
 
 
 // express App
@@ -53,7 +51,6 @@ app.use('/api/departments', departmentRoutes)
 app.use('/api/patients', patientRoutes)
 app.use('/api/nurses', nurseRoutes)
 app.use('/api/pharmacy', pharmacyRoutes)
-app.use('/api/uploadRoute', uploadRoutes)
 app.use('/api/', userRoutes);
 
 //connect to db
