@@ -11,6 +11,7 @@
   "author": "Ahamba Ohale",
   "license": "ISC",
   "dependencies": {
+    "bcrypt": "^5.1.1",
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.20.2",
     "cookie-parser": "^1.4.6",
@@ -25,6 +26,7 @@
     "nodemailer": "^6.9.9",
     "nodemailer-sendgrid-transport": "^0.2.0",
     "nodemon": "^3.0.3",
+    "password-validator": "^5.3.0",
     "paystack": "^2.0.1",
     "validator": "^13.11.0"
   }
