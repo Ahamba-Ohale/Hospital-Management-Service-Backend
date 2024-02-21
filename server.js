@@ -8,6 +8,8 @@ const departmentRoutes = require('./route/admin/departments')
 const patientRoutes = require('./route/admin/patients')
 const nurseRoutes = require('./route/admin/nurses')
 const pharmacyRoutes = require('./route/admin/pharmacy')
+const appointmentRoutes = require('./Route/appointment')
+const medicalHistoryRoutes = require('./Route/admin/medicalHistory')
 const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
@@ -47,6 +49,8 @@ app.use('/api/departments', departmentRoutes)
 app.use('/api/patients', patientRoutes)
 app.use('/api/nurses', nurseRoutes)
 app.use('/api/pharmacy', pharmacyRoutes)
+app.use('/api/appointment', appointmentRoutes)
+app.use('/api/medicalHistory', medicalHistoryRoutes)
 app.use('/api/', userRoutes);
 
 //connect to db
