@@ -14,10 +14,6 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser')
 const router = require('./routes/paymentRoute');
 const paystack = require('paystack')(process.env.PAYSTACK_SECRET_KEY);
-
-
-// const bodyParser = require('body-parser')
-// const paystack = require('paystack')(process.env.PAYSTACK_SECRET_KEY);
 const userRoutes = require('./userRoute');
 
 
@@ -45,6 +41,7 @@ app.use((req, res, next) => {
 
 
 // routes
+app.use('/api/articleRoutes', articleRoute)
 app.use('/api/doctors', doctorRoutes)
 app.use('/api/departments', departmentRoutes)
 app.use('/api/patients', patientRoutes)
