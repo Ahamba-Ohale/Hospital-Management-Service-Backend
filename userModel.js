@@ -87,6 +87,41 @@ const userSchema = new mongoose.Schema({
     },
     required: [true, 'Address is required and must include country, street, city, and state'],
   },
+  dateOfBirth: {
+    type: Date,
+    required: [true, 'Date of birth is required'],
+    validate: {
+      validator: function (value) {
+        // Custom date of birth validation logic (e.g., must be in the past)
+        return value < new Date();
+      },
+      message: 'Invalid date of birth',
+    },
+  },
+  emergencyContact: {
+    type: {
+      name: {
+        type: String,
+        required: [true, 'Emergency contact name is required'],
+      },
+      relationship: {
+        type: String,
+        required: [true, 'Relationship is required'],
+      },
+      contact: {
+        type: String,
+        required: [true, 'Emergency contact number is required'],
+        validate: {
+          validator: function (value) {
+            // Custom emergency contact validation logic
+            return /(?:\+?(\d{1,4}?)[-\s.]?)?((\d{3})|\d{3})[-.\s]?\d{3}[-.\s]?\d{4}/.test(value);
+          },
+          message: 'Emergency contact must be a valid phone number',
+        },
+      },
+    },
+    required: [true, 'Emergency contact details are required'],
+  },
   isVerified: {
     type: Boolean,
     default: false,
