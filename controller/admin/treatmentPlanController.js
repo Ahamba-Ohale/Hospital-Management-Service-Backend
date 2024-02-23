@@ -25,7 +25,7 @@ const getTreatmentPlan = async (req, res) => {
     res.status(200).json(treatmentPlan)
 }
 
-// Create a doctor
+// Create a treatment plan
 const createTreatmentPlan = async (req, res) => {
     // console.log('Creating a new doctor...')
     // const user_id = req.user._id;
@@ -53,11 +53,11 @@ const createTreatmentPlan = async (req, res) => {
     //     return res.status(400).json({ error: 'Please fill in all the fields', emptyFields });
     // }
 
-    const {description, medication, startDate, endDate} = req.body
+    const {description, medications, startDate, endDate} = req.body
 
     // Add treatment plan to db
     try {
-        const treatmentPlan = await TreatmentPlan.create({description, medication, startDate, endDate});
+        const treatmentPlan = await TreatmentPlan.create({description, medications, startDate, endDate});
         res.status(200).json(treatmentPlan);
     } catch (error) {
        
