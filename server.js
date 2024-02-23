@@ -11,6 +11,7 @@ const pharmacyRoutes = require('./route/admin/pharmacy')
 const appointmentRoutes = require('./Route/appointment')
 const medicalHistoryRoutes = require('./Route/admin/medicalHistory')
 const treatmentPlanRoutes = require('./Route/admin/treatmentPlan')
+const vitalRoutes = require('./Route/admin/vitals')
 const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
@@ -54,6 +55,7 @@ app.use('/api/appointment', appointmentRoutes)
 app.use('/api/medicalHistory', medicalHistoryRoutes)
 app.use('/api/', userRoutes)
 app.use('/api/treatmentPlan', treatmentPlanRoutes)
+app.use('/api/vital', vitalRoutes)
 
 //connect to db
 mongoose.connect(process.env.MONGO_URI)
