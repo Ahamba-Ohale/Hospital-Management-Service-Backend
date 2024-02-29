@@ -13,12 +13,51 @@ passwordSchema
   .has().symbols();  // Must have symbols
 
 const userSchema = new mongoose.Schema({
-  username: {
+  title: {
     type: String,
-    required: [true, 'Username is required'],
-    minlength: [3, 'Name must be at least 3 characters long'],
-    maxlength: [50, 'Name cannot exceed 50 characters'],
-    match: [/^[a-zA-Z' -]+$/, 'Name can only contain letters, spaces, hyphens, or apostrophes.'],
+    required: [true, 'Title is required'],
+    enum: ['Mr.', 'Mrs.', 'Ms.', 'Dr.', 'Master'],
+  },
+  gender: {
+    type: String,
+    required: [true, 'Gender is required'],
+    enum: ['Male', 'Female', 'Unknown'],
+  },
+  firstname: {
+    type: String,
+    required: [true, 'First Name is required'],
+    minlength: [3, 'First Name must be at least 3 characters long'],
+    maxlength: [50, 'First Name cannot exceed 50 characters'],
+    match: [/^[a-zA-Z' -]+$/, 'First Name can only contain letters, spaces, hyphens, or apostrophes.'],
+  },
+  lastname: {
+    type: String,
+    required: [true, 'Last Name is required'],
+    minlength: [3, 'Last Name must be at least 3 characters long'],
+    maxlength: [50, 'Last Name cannot exceed 50 characters'],
+    match: [/^[a-zA-Z' -]+$/, 'Last Name can only contain letters, spaces, hyphens, or apostrophes.'],
+  },
+  dateOfBirth: {
+    type: Date,
+    required: [true, 'Date of birth is required'],
+    validate: {
+      validator: function (value) {
+        // Custom date of birth validation logic (e.g., must be in the past)
+        return value < new Date();
+      },
+      message: 'Invalid date of birth',
+    },
+  },
+  contact: {
+    type: String,
+    required: [true, 'Contact is required'],
+    validate: {
+      validator: function (value) {
+        // Custom contact validation logic
+        return /(?:\+?(\d{1,4}?)[-\s.]?)?((\d{3})|\d{3})[-.\s]?\d{3}[-.\s]?\d{4}/.test(value);
+      },
+      message: 'Contact must be a valid phone number',
+    }
   },
   email: {
     type: String,
@@ -45,83 +84,6 @@ const userSchema = new mongoose.Schema({
       message: 'Password must meet the specified criteria.',
     }
   },
-  contact: {
-    type: String,
-    required: [true, 'Contact is required'],
-    validate: {
-      validator: function (value) {
-        // Custom contact validation logic
-        // You can use external libraries or implement your logic here
-        return /(?:\+?(\d{1,4}?)[-\s.]?)?((\d{3})|\d{3})[-.\s]?\d{3}[-.\s]?\d{4}/.test(value);
-      },
-      message: 'Contact must be a valid phone number',
-    }
-  },
-  address: {
-    type: {
-      country: {
-        type: String,
-        required: [true, 'Country is required'],
-      },
-      street: {
-        type: String,
-        required: [true, 'Street is required'],
-      },
-      city: {
-        type: String,
-        required: [true, 'City is required'],
-      },
-      state: {
-        type: String,
-        required: [true, 'State is required'],
-      },
-      zip: {
-        type: String,
-        validate: {
-          validator: function (value) {
-            return /^\d{5}(?:-\d{4})?$/.test(value);
-          },
-          message: 'Invalid ZIP code format',
-        },
-      },
-    },
-    required: [true, 'Address is required and must include country, street, city, and state'],
-  },
-  dateOfBirth: {
-    type: Date,
-    required: [true, 'Date of birth is required'],
-    validate: {
-      validator: function (value) {
-        // Custom date of birth validation logic (e.g., must be in the past)
-        return value < new Date();
-      },
-      message: 'Invalid date of birth',
-    },
-  },
-  emergencyContact: {
-    type: {
-      name: {
-        type: String,
-        required: [true, 'Emergency contact name is required'],
-      },
-      relationship: {
-        type: String,
-        required: [true, 'Relationship is required'],
-      },
-      contact: {
-        type: String,
-        required: [true, 'Emergency contact number is required'],
-        validate: {
-          validator: function (value) {
-            // Custom emergency contact validation logic
-            return /(?:\+?(\d{1,4}?)[-\s.]?)?((\d{3})|\d{3})[-.\s]?\d{3}[-.\s]?\d{4}/.test(value);
-          },
-          message: 'Emergency contact must be a valid phone number',
-        },
-      },
-    },
-    required: [true, 'Emergency contact details are required'],
-  },
   isVerified: {
     type: Boolean,
     default: false,
@@ -131,9 +93,10 @@ const userSchema = new mongoose.Schema({
   },
   verificationCodeExpiry: {
     type: Date,
-  }
+  },
 }, { timestamps: true });
 
+// Custom validation method
 userSchema.methods.customValidate = async function () {
   try {
     await this.validate();
