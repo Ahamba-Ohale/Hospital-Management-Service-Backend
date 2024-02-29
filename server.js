@@ -8,16 +8,16 @@ const departmentRoutes = require('./route/admin/departments')
 const patientRoutes = require('./route/admin/patients')
 const nurseRoutes = require('./route/admin/nurses')
 const pharmacyRoutes = require('./route/admin/pharmacy')
+const appointmentRoutes = require('./Route/appointment')
+const medicalHistoryRoutes = require('./Route/admin/medicalHistory')
+const treatmentPlanRoutes = require('./Route/admin/treatmentPlan')
+const vitalRoutes = require('./Route/admin/vitals')
 const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser')
 const router = require('./routes/paymentRoute');
 const paystack = require('paystack')(process.env.PAYSTACK_SECRET_KEY);
-
-
-// const bodyParser = require('body-parser')
-// const paystack = require('paystack')(process.env.PAYSTACK_SECRET_KEY);
 const userRoutes = require('./userRoute');
 
 
@@ -51,7 +51,11 @@ app.use('/api/departments', departmentRoutes)
 app.use('/api/patients', patientRoutes)
 app.use('/api/nurses', nurseRoutes)
 app.use('/api/pharmacy', pharmacyRoutes)
-app.use('/api/', userRoutes);
+app.use('/api/appointment', appointmentRoutes)
+app.use('/api/medicalHistory', medicalHistoryRoutes)
+app.use('/api/', userRoutes)
+app.use('/api/treatmentPlan', treatmentPlanRoutes)
+app.use('/api/vital', vitalRoutes)
 
 //connect to db
 mongoose.connect(process.env.MONGO_URI)
