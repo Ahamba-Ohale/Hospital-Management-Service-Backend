@@ -23,19 +23,12 @@ const userSchema = new mongoose.Schema({
     required: [true, 'Gender is required'],
     enum: ['Male', 'Female', 'Unknown'],
   },
-  firstname: {
+  fullname: {
     type: String,
     required: [true, 'First Name is required'],
     minlength: [3, 'First Name must be at least 3 characters long'],
     maxlength: [50, 'First Name cannot exceed 50 characters'],
     match: [/^[a-zA-Z' -]+$/, 'First Name can only contain letters, spaces, hyphens, or apostrophes.'],
-  },
-  lastname: {
-    type: String,
-    required: [true, 'Last Name is required'],
-    minlength: [3, 'Last Name must be at least 3 characters long'],
-    maxlength: [50, 'Last Name cannot exceed 50 characters'],
-    match: [/^[a-zA-Z' -]+$/, 'Last Name can only contain letters, spaces, hyphens, or apostrophes.'],
   },
   dateOfBirth: {
     type: Date,
@@ -84,6 +77,18 @@ const userSchema = new mongoose.Schema({
       message: 'Password must meet the specified criteria.',
     }
   },
+  confirmPassword: {
+    type: String,
+    validate: {
+      validator: function (value) {
+        // Access the document being validated using the context option
+        return value === this.password;
+      },
+      message: 'Passwords do not match',
+      // Pass the document to the validator using the context option
+      context: 'confirmPassword', 
+    },
+  },  
   isVerified: {
     type: Boolean,
     default: false,

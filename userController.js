@@ -7,7 +7,9 @@ const User = require("./userModel");
 
 exports.registerUser = async (req, res) => {
   try {
-    const newUser = new User(req.body);
+    const { confirmPassword, ...userData } = req.body;
+
+    const newUser = new User(userData);
 
     // Call the asynchronous custom validation method with await
     const validationResponse = await newUser.customValidate();
@@ -16,14 +18,17 @@ exports.registerUser = async (req, res) => {
       return res.status(400).json({ message: validationResponse.errors });
     }
 
-    const existingUser = await User.findOne({ email: req.body.email });
-    if (existingUser) {
-      return res.status(400).json({ email: "Email already exists" });
+    // Check if passwords match
+    if (req.body.password !== confirmPassword) {
+      return res.status(400).json({ confirmPassword: "Passwords do not match" });
     }
 
     const salt = bcrypt.genSaltSync(10);
     const hashedPassword = bcrypt.hashSync(req.body.password, salt);
+    const hashedConfirmPassword = bcrypt.hashSync(confirmPassword, salt);
+
     newUser.password = hashedPassword;
+    newUser.confirmPassword = hashedConfirmPassword;
 
     // Set isVerified to true when generating the verification code
     newUser.isVerified = true;
