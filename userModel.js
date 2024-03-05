@@ -23,7 +23,7 @@ const userSchema = new mongoose.Schema({
     required: [true, 'Gender is required'],
     enum: ['Male', 'Female', 'Unknown'],
   },
-  fullname: {
+  name: {
     type: String,
     required: [true, 'First Name is required'],
     minlength: [3, 'First Name must be at least 3 characters long'],
