@@ -25,10 +25,10 @@ const userSchema = new mongoose.Schema({
   },
   name: {
     type: String,
-    required: [true, 'First Name is required'],
-    minlength: [3, 'First Name must be at least 3 characters long'],
-    maxlength: [50, 'First Name cannot exceed 50 characters'],
-    match: [/^[a-zA-Z' -]+$/, 'First Name can only contain letters, spaces, hyphens, or apostrophes.'],
+    required: [true, 'Full Name is required'],
+    minlength: [3, 'Full Name must be at least 3 characters long'],
+    maxlength: [50, 'Full Name cannot exceed 50 characters'],
+    match: [/^[a-zA-Z' -]+$/, 'Full Name can only contain letters, spaces, hyphens, or apostrophes.'],
   },
   dateOfBirth: {
     type: Date,
