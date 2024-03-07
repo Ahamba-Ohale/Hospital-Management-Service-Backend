@@ -9,7 +9,7 @@ router.post('/forgot-password', userController.forgotPassword);
 router.post('/reset-password', userController.resetPassword);
 router.post('/logout', userController.logoutUser);
 
-// Verification route
-router.post('/verify-user', userController.verifyUser);
+// Verification route with placeholders for parameters
+router.get('/verify-email/:token/:userId', userController.verifyEmail);
 
 module.exports = router;
