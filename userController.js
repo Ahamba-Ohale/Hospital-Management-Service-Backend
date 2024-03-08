@@ -5,6 +5,21 @@ const bcrypt = require('bcryptjs');
 const nodemailer = require('nodemailer');
 const User = require('./userModel');
 const Token = require("./utils/token");
+const handlebars = require('handlebars');
+const { promisify } = require('util');
+const fs = require('fs');
+
+// Function to read the HTML template file
+const readHTMLTemplate = async (templatePath) => {
+  try {
+    const readFileAsync = promisify(fs.readFile);
+    const templateContent = await readFileAsync(templatePath, 'utf8');
+    return templateContent;
+  } catch (error) {
+    console.error(`Error reading HTML template: ${error.message}`);
+    throw new Error(`Error reading HTML template: ${error.message}`);
+  }    
+};
 
 exports.registerUser = async (req, res) => {
   try {
@@ -42,7 +57,7 @@ exports.registerUser = async (req, res) => {
     await newUser.save();
     await token.save();
 
-    await sendVerificationEmail(newUser.email, "Verify Email", url);
+    await sendVerificationEmail(newUser.email, "Verify Email", newUser, token.token);
 
     return res.status(201).send({ message: "An email has been sent to your account. Please verify." });
   } catch (err) {
@@ -51,7 +66,8 @@ exports.registerUser = async (req, res) => {
   }
 };
 
-const sendVerificationEmail = async (email, subject, text) => {
+// Function to send the verification email
+const sendVerificationEmail = async (email, subject, user, verificationToken) => {
   try {
     const transporter = nodemailer.createTransport({
       host: process.env.HOST,
@@ -64,16 +80,31 @@ const sendVerificationEmail = async (email, subject, text) => {
       },
     });
 
+    const verificationUrl = `${process.env.BASE_URL}verify-email?token=${verificationToken}`;
+
+    // Read the HTML template
+    const templatePath = './utils/verifyEmailTemplate.html';
+    const templateContent = await readHTMLTemplate(templatePath);
+
+    // Compile the template with Handlebars
+    const compiledTemplate = handlebars.compile(templateContent);
+
+    // Pass dynamic data to the template
+    const userObject = user.toObject();
+    const htmlContent = compiledTemplate({ name: userObject.name, email: userObject.email, verificationUrl });
+
+    // Send the email
     await transporter.sendMail({
       from: process.env.USER,
       to: email,
       subject: subject,
-      text: text,
+      html: htmlContent,
     });
-    console.log("Email sent Successfully");
+
+    console.log("Verification email sent successfully");
   } catch (error) {
-    console.log("Email not sent");
-    console.log(error);
+    console.error("Error sending verification email:", error);
+    throw new Error("Error sending verification email");
   }
 };
 
@@ -128,7 +159,7 @@ exports.loginUser = async (req, res) => {
         }).save();
 
         const url = `${process.env.BASE_URL}users/${user._id}/verify/${authToken.token}`;
-        await sendVerificationEmail(user.email, "Verify Email", url);
+        await sendVerificationEmail(user.email, "Verify your email address for Great Towers Hospital", url);
       }
 
       return res.status(403).json({ message: "An Email has been sent to your account. Please verify" });
@@ -210,8 +241,8 @@ exports.resetPassword = async (req, res) => {
   }
 };
 
+// Function to send the password reset email
 const sendPasswordResetEmail = async (user, resetToken) => {
-  // Implement the logic to send the password reset email
   try {
     const transporter = nodemailer.createTransport({
       host: process.env.HOST,
@@ -225,12 +256,24 @@ const sendPasswordResetEmail = async (user, resetToken) => {
     });
 
     const resetUrl = `${process.env.BASE_URL}reset-password?token=${resetToken}&userId=${user._id}`;
-    
+
+    // Read the HTML template file
+    const templatePath = './utils/resetEmailTemplate.html';
+    const htmlTemplate = await readHTMLTemplate(templatePath);
+
+    // Compile the template using Handlebars
+    const compiledTemplate = handlebars.compile(htmlTemplate);
+
+    const htmlContent = compiledTemplate({
+      user: { name: user.name, email: user.email },
+      resetUrl,
+    });
+
     await transporter.sendMail({
       from: process.env.USER,
       to: user.email,
       subject: "Reset Your Password",
-      text: `Click on the following link to reset your password: ${resetUrl}`,
+      html: htmlContent,
     });
 
     console.log("Password reset email sent successfully");
