@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const passwordValidator = require("password-validator");
+const jwt = require("jsonwebtoken")
 
 // Create a password schema
 const passwordSchema = new passwordValidator();
@@ -13,12 +14,24 @@ passwordSchema
   .has().symbols();  // Must have symbols
 
 const userSchema = new mongoose.Schema({
-  username: {
+  title: {
     type: String,
-    required: [true, 'Username is required'],
-    minlength: [3, 'Name must be at least 3 characters long'],
-    maxlength: [50, 'Name cannot exceed 50 characters'],
-    match: [/^[a-zA-Z' -]+$/, 'Name can only contain letters, spaces, hyphens, or apostrophes.'],
+    required: [true, 'Title is required'],
+    enum: ['Mr.', 'Mrs.', 'Ms.', 'Dr.', 'Master', 'Other'],
+    default: 'Other',
+  },
+  gender: {
+    type: String,
+    required: [true, 'Gender is required'],
+    enum: ['Male', 'Female', 'Other'],
+    default: 'Other',
+  },  
+  name: {
+    type: String,
+    required: [true, 'Full Name is required'],
+    minlength: [3, 'Full Name must be at least 3 characters long'],
+    maxlength: [50, 'Full Name cannot exceed 50 characters'],
+    match: [/^[a-zA-Z' -]+$/, 'Full Name can only contain letters, spaces, hyphens, or apostrophes.'],
   },
   email: {
     type: String,
@@ -42,50 +55,31 @@ const userSchema = new mongoose.Schema({
         // Use the password-schema to validate the password
         return passwordSchema.validate(value, { list: true }).length === 0;
       },
-      message: 'Password must meet the specified criteria.',
+      message: (props) => `Password must meet the specified criteria: ${passwordSchema.validate(props.value, { list: true }).join(', ')}`
     }
-  },
+  },  
+  confirmPassword: {
+    type: String,
+    validate: {
+      validator: function (value) {
+        // Access the document being validated using the context option
+        return value === this.password;
+      },
+      message: 'Passwords do not match',
+      // Pass the document to the validator using the context option
+      context: 'confirmPassword', 
+    },
+  },  
   contact: {
     type: String,
     required: [true, 'Contact is required'],
     validate: {
       validator: function (value) {
         // Custom contact validation logic
-        // You can use external libraries or implement your logic here
         return /(?:\+?(\d{1,4}?)[-\s.]?)?((\d{3})|\d{3})[-.\s]?\d{3}[-.\s]?\d{4}/.test(value);
       },
       message: 'Contact must be a valid phone number',
     }
-  },
-  address: {
-    type: {
-      country: {
-        type: String,
-        required: [true, 'Country is required'],
-      },
-      street: {
-        type: String,
-        required: [true, 'Street is required'],
-      },
-      city: {
-        type: String,
-        required: [true, 'City is required'],
-      },
-      state: {
-        type: String,
-        required: [true, 'State is required'],
-      },
-      zip: {
-        type: String,
-        validate: {
-          validator: function (value) {
-            return /^\d{5}(?:-\d{4})?$/.test(value);
-          },
-          message: 'Invalid ZIP code format',
-        },
-      },
-    },
-    required: [true, 'Address is required and must include country, street, city, and state'],
   },
   dateOfBirth: {
     type: Date,
@@ -98,48 +92,34 @@ const userSchema = new mongoose.Schema({
       message: 'Invalid date of birth',
     },
   },
-  emergencyContact: {
-    type: {
-      name: {
-        type: String,
-        required: [true, 'Emergency contact name is required'],
-      },
-      relationship: {
-        type: String,
-        required: [true, 'Relationship is required'],
-      },
-      contact: {
-        type: String,
-        required: [true, 'Emergency contact number is required'],
-        validate: {
-          validator: function (value) {
-            // Custom emergency contact validation logic
-            return /(?:\+?(\d{1,4}?)[-\s.]?)?((\d{3})|\d{3})[-.\s]?\d{3}[-.\s]?\d{4}/.test(value);
-          },
-          message: 'Emergency contact must be a valid phone number',
-        },
-      },
-    },
-    required: [true, 'Emergency contact details are required'],
-  },
   isVerified: {
     type: Boolean,
     default: false,
   },
-  verificationCode: {
-    type: String,
-  },
-  verificationCodeExpiry: {
-    type: Date,
-  }
 }, { timestamps: true });
 
+// Token
+userSchema.methods.generateAuthToken = function () {
+  const token = jwt.sign({ _id: this._id }, process.env.JWT_SECRET_KEY, { expiresIn: '7d' });
+  return token;
+};
+
+// Custom validation method
 userSchema.methods.customValidate = async function () {
   try {
     await this.validate();
     return null; // No errors
   } catch (error) {
     const errors = {};
+
+    // Handle general errors
+    if (error.name !== 'ValidationError') {
+      console.error('Error during custom validation:', error);
+      errors['_general'] = 'An unexpected error occurred during validation';
+      return { errors };
+    }    
+
+    // Handle validation errors
     error.errors && Object.keys(error.errors).forEach((key) => {
       errors[key] = error.errors[key].message;
     });
