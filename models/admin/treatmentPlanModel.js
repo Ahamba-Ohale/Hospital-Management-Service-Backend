@@ -12,7 +12,8 @@ const treatmentPlanSchema = new Schema({
     startDate: { 
         type: Date, 
         required: true },
-    endDate: { type: Date }
+    endDate: { type: Date },
+    
 }, { timestamps: true })
 
 treatmentPlanSchema.methods.isValid = () => {
