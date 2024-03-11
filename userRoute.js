@@ -10,6 +10,6 @@ router.post('/reset-password', userController.resetPassword);
 router.post('/logout', userController.logoutUser);
 
 // Verification route with placeholders for parameters
-router.get('/:token/verify/:id', userController.verifyEmail);
+router.get('/:id/verify/:token', userController.verifyEmail);
 
 module.exports = router;
