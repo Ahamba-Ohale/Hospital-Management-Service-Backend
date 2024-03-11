@@ -14,6 +14,7 @@ router.post('/', createTreatmentPlan)
 
 // retrieve all treatment plans
 router.get('/', getTreatmentPlans);
+// router.get('/', getTreatmentPlans);
 
 // retrieve a single treatment plan by id
 router.get('/:id', getTreatmentPlan);

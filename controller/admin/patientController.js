@@ -27,32 +27,7 @@ const getPatient = async (req, res) => {
 
 // Create a patient
 const  createPatient = async (req, res) => {
-    // console.log('Creating a new doctor...')
-    // const user_id = req.user._id;
-
-    // let emptyFields = [];
-
-    // if (!req.body.name) {
-    //     emptyFields.push('fullname');
-    // }
-    // if (!req.body.email) {
-    //     emptyFields.push('email');
-    // }
-    // if (!req.body.phone) {
-    //     emptyFields.push('phone');
-    // }
-    // if (!req.body.address) {
-    //     emptyFields.push('address');
-    // }
-    // if (!req.body.specialty) {
-    //     emptyFields.push('specialty');
-    // }
-
-    // if (emptyFields.length > 0) {
-    //     console.log('Error: Missing required fields', emptyFields);
-    //     return res.status(400).json({ error: 'Please fill in all the fields', emptyFields });
-    // }
-
+    
     const {
         firstName,
         lastName,

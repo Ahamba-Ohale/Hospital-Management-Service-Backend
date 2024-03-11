@@ -42,7 +42,15 @@ const patientSchema = new Schema({
       insuranceInformation: {
         provider: { type: String },
         policyNumber: { type: String },
-      }
-}, { timestamps: true });
+      },
+      createdAt: {
+        type: Date,
+        default: Date.now,
+        required: true,
+      },
+    },
+    { timestamps: true }
+  );
+
 
 module.exports = mongoose.model('Patient', patientSchema)
