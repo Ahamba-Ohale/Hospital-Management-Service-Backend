@@ -10,7 +10,7 @@ const patientSchema = new Schema({
     lastName: {
         type: String,
         required: true
-    },
+    }, 
     contactInformation: {
         email: { 
             type: String, 
