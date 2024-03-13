@@ -29,25 +29,31 @@ const getPatient = async (req, res) => {
 const  createPatient = async (req, res) => {
     
     const {
-        firstName,
-        lastName,
-        contactInformation: { email, phoneNumber, address },
+        name,
+        email, 
+        phoneNumber, 
+        address,
         bloodType,
         genoType,
-        demographicDetails: { dateOfBirth, gender },
-        insuranceInformation: { provider, policyNumber },
+        dateOfBirth, 
+        gender,
+        provider, 
+        policyNumber
       } = req.body;
     
     // Add patient to db
     try {
         const patient = await Patient.create({
-            firstName,
-            lastName,
-            contactInformation: { email, phoneNumber, address },
+            name,
+            email, 
+            phoneNumber, 
+            address,
             bloodType,
             genoType,
-            demographicDetails: { dateOfBirth, gender },
-            insuranceInformation: { provider, policyNumber },
+            dateOfBirth, 
+            gender,
+            provider, 
+            policyNumber
           }
         );
         res.status(200).json(patient);

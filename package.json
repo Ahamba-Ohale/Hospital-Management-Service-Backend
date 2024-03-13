@@ -23,6 +23,8 @@
     "express-validator": "^7.0.1",
     "fs": "^0.0.1-security",
     "handlebars": "^4.7.8",
+    "joi": "^17.12.2",
+    "joi-password-complexity": "^5.2.0",
     "jsonwebtoken": "^9.0.2",
     "moment": "^2.30.1",
     "mongodb": "^6.3.0",
