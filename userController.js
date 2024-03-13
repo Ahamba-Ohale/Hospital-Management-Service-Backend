@@ -23,46 +23,44 @@ const readHTMLTemplate = async (templatePath) => {
 
 exports.registerUser = async (req, res) => {
   try {
-    const newUser = new User(req.body);
+    const user = new User(req.body);
 
-    const validationResponse = await newUser.customValidate();
+    const validationResponse = await user.customValidate();
 
     if (validationResponse && validationResponse.errors && Object.keys(validationResponse.errors).length > 0) {
-      return res.status(400).json({ message: validationResponse.errors });
+      return res.status(400).send({ message: validationResponse.errors });
     }
 
-    const existingEmail = await User.findOne({ email: newUser.email });
+    let existingEmail = await User.findOne({ email: user.email });
     if (existingEmail) {
-      return res.status(409).json({ message: "User with given email already exists!" });
+      return res.status(409).send({ message: "User with given email already exists!" });
     }
 
     if (req.body.password !== req.body.confirmPassword) {
-      return res.status(400).json({ confirmPassword: 'Passwords do not match' });
+      return res.status(400).send({ confirmPassword: 'Passwords do not match' });
     }
 
     const salt = await bcrypt.genSalt(Number(process.env.SALT));
     const hashedPassword = await bcrypt.hash(req.body.password, salt);
     const hashedConfirmPassword = await bcrypt.hash(req.body.confirmPassword, salt);
 
-    newUser.password = hashedPassword;
-    newUser.confirmPassword = hashedConfirmPassword;
+    user.password = hashedPassword;
+    user.confirmPassword = hashedConfirmPassword;
 
     const token = new Token({
-      userId: newUser._id,
+      userId: user._id,
       token: crypto.randomBytes(32).toString('hex'),
-    });
+    }).save();
     
-    const verificationUrl = `${process.env.BASE_URL}verify-email/${token.token}/verify/${newUser._id}`;
+    const verificationUrl = `${process.env.BASE_URL}verify-email/${user._id}/verify/${token.token}`;
     
-    await newUser.save();
-    await token.save();
+    await user.save();
     
-    await sendVerificationEmail(newUser.email, "Verify Email", verificationUrl);
+    await sendVerificationEmail(user.email, "Verify Email", verificationUrl);
     
-    return res.status(201).json({ message: "An email has been sent to your account. Please verify." });    
-  } catch (err) {
-    console.error(`Error in registerUser: ${err.message}`);
-    return res.status(500).json({ message: "Internal Server Error" });
+    return res.status(201).send({ message: "An email has been sent to your account. Please verify." });    
+  } catch (error) {
+    return res.status(500).send({ message: "Internal Server Error" });
   }
 };
 
@@ -101,8 +99,8 @@ const sendVerificationEmail = async (email, subject, verificationUrl) => {
     })
     console.log("Email Sent Successfully");
   } catch (error) {
-    console.error("Error sending email:", error);
-    throw new Error("Error sending email");
+    console.log("Email not sent");
+    console.log(error);
   }
 };
 
@@ -110,26 +108,21 @@ exports.verifyEmail = async (req, res) => {
   try {
     const user = await User.findOne({ _id: req.params.id });
 
-    if (!user) {
-      return res.status(404).json({ error: "User not found" });
-    }
+    if (!user) return res.status(404).json({ error: "Invalid link" });
 
     const token = await Token.findOne({
       userId: user._id,
       token: req.params.token,
     });
 
-    if (!token) {
-      return res.status(404).json({ error: "Invalid verification link" });
-    }
+    if (!token) return res.status(404).json({ error: "Invalid verification link" });
 
     await User.updateOne({ _id: user._id, verified: true });
     await token.remove();
 
     return res.status(200).json({ message: "Email verified successfully" });
   } catch (err) {
-    console.error(`Error in verifyEmail: ${err.message}`);
-    return res.status(500).json({ error: "Internal Server Error" });
+    res.status(500).json({ message: "Internal Server Error" });
   }
 };
 
@@ -138,13 +131,13 @@ exports.loginUser = async (req, res) => {
     const user = await User.findOne({ email: req.body.email });
 
     if (!user) {
-      return res.status(400).json({ message: "Invalid email" });
+      return res.status(400).send({ message: "Invalid email" });
     }
 
     const isPasswordValid = await bcrypt.compare(req.body.password, user.password);
 
     if (!isPasswordValid) {
-      return res.status(400).json({ message: "Invalid password" });
+      return res.status(400).send({ message: "Invalid password" });
     }
 
     if (!user.isVerified) {
@@ -153,22 +146,19 @@ exports.loginUser = async (req, res) => {
         token = new Token({
           userId: user._id,
           token: crypto.randomBytes(32).toString('hex'),
-        });
-      }
-      
-      const verificationUrl = `${process.env.BASE_URL}verify-email/${token.token}/verify/${user._id}`;
-      await token.save();
-      
-      // Send the email with the verification URL
-      await sendVerificationEmail(user.email, "Verify Email", verificationUrl);
+        }).save();
 
-      return res.status(201).send({ message: "An email has been sent to your account. Please verify." });
+        const verificationUrl = `${process.env.BASE_URL}verify-email/${user._id}/verify/${token.token}`;
+
+        // Send the email with the verification URL
+        await sendVerificationEmail(user.email, "Verify Email", verificationUrl);
+      }
+      return res.status(400).send({ message: "An email has been sent to your account. Please verify." });
     }
 
     const token = user.generateAuthToken();
     return res.status(200).send({ data: token, message: "Logged in successfully" });
-  } catch (err) {
-    console.error(`Error in loginUser: ${err.message}`);
+  } catch (error) {
     return res.status(500).send({ message: "Internal Server Error" });
   }
 };
@@ -217,15 +207,15 @@ exports.resetPassword = async (req, res) => {
   const { password, resetToken, userId } = req.body;
 
   try {
-    const newUser = await User.findById(userId);
+    const user = await User.findById(userId);
 
-    if (!newUser) {
+    if (!user) {
       return res.status(400).json({ message: "Invalid user ID" });
     }
 
     if (
-      newUser.passwordResetToken !== resetToken ||
-      newUser.passwordResetTokenExpiry < new Date()
+      user.passwordResetToken !== resetToken ||
+      user.passwordResetTokenExpiry < new Date()
     ) {
       return res.status(400).json({ message: "Invalid password reset token" });
     }
@@ -236,17 +226,17 @@ exports.resetPassword = async (req, res) => {
     user.password = hashedPassword;
     user.passwordResetToken = null;
     user.passwordResetTokenExpiry = null;
-    await newUser.save();
+    await user.save();
 
-    return res.status(200).json({ message: "Password reset successful" });
-  } catch (err) {
-    console.error(`Error in resetPassword: ${err.message}`);
-    return res.status(500).json({ message: "Internal Server Error" });
+    return res.status(200).send({ message: "Password reset successful" });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).send({ message: "Internal Server Error" });
   }
 };
 
 // Function to send the password reset email
-const sendPasswordResetEmail = async (newUser, secureRandomToken) => {
+const sendPasswordResetEmail = async (user, secureRandomToken) => {
   try {
     const transporter = nodemailer.createTransport({
       host: process.env.HOST,
@@ -269,13 +259,13 @@ const sendPasswordResetEmail = async (newUser, secureRandomToken) => {
     const compiledTemplate = handlebars.compile(htmlTemplate);
 
     const htmlContent = compiledTemplate({
-      user: { name: newUser.name, email: newUser.email },
+      user: { name: user.name, email: user.email },
       resetUrl,
     });
 
     await transporter.sendMail({
       from: process.env.USER,
-      to: newUser.email,
+      to: user.email,
       subject: "Reset Your Password",
       html: htmlContent,
     });

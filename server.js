@@ -21,6 +21,11 @@ const paystack = require('paystack')(process.env.PAYSTACK_SECRET_KEY);
 const userRoutes = require('./userRoute');
 
 
+
+// const userRoutes = require('./TEST/routes/user');
+// const authRoutes = require('./TEST/routes/auth');
+
+
 // express App
 const app = express();
 
@@ -56,6 +61,11 @@ app.use('/api/medicalHistory', medicalHistoryRoutes)
 app.use('/api/', userRoutes)
 app.use('/api/treatmentPlan', treatmentPlanRoutes)
 app.use('/api/vital', vitalRoutes)
+
+
+
+// app.use('/api/users', userRoutes)
+// app.use('/api/auth', authRoutes)
 
 //connect to db
 mongoose.connect(process.env.MONGO_URI)
