@@ -18,12 +18,11 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser')
 const router = require('./routes/paymentRoute');
 const paystack = require('paystack')(process.env.PAYSTACK_SECRET_KEY);
-const userRoutes = require('./userRoute');
 
 
 
-// const userRoutes = require('./TEST/routes/user');
-// const authRoutes = require('./TEST/routes/auth');
+const userRoutes = require('./auth/routes/user');
+const authRoutes = require('./auth/routes/auth');
 
 
 // express App
@@ -58,14 +57,13 @@ app.use('/api/nurses', nurseRoutes)
 app.use('/api/pharmacy', pharmacyRoutes)
 app.use('/api/appointment', appointmentRoutes)
 app.use('/api/medicalHistory', medicalHistoryRoutes)
-app.use('/api/', userRoutes)
 app.use('/api/treatmentPlan', treatmentPlanRoutes)
 app.use('/api/vital', vitalRoutes)
 
 
 
-// app.use('/api/users', userRoutes)
-// app.use('/api/auth', authRoutes)
+app.use('/api/users', userRoutes)
+app.use('/api/auth', authRoutes)
 
 //connect to db
 mongoose.connect(process.env.MONGO_URI)

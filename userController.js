@@ -1,5 +1,6 @@
 require('dotenv').config();
 
+const router = require("express").Router();
 const crypto = require('crypto');
 const bcrypt = require('bcryptjs');
 const nodemailer = require('nodemailer');
@@ -21,7 +22,7 @@ const readHTMLTemplate = async (templatePath) => {
   }
 };
 
-exports.registerUser = async (req, res) => {
+router.post("/", async (req, res) => {
   try {
     const user = new User(req.body);
 
@@ -62,7 +63,7 @@ exports.registerUser = async (req, res) => {
   } catch (error) {
     return res.status(500).send({ message: "Internal Server Error" });
   }
-};
+});
 
 // Function to send the verification email
 const sendVerificationEmail = async (email, subject, verificationUrl) => {
