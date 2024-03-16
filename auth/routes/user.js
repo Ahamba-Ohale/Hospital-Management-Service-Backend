@@ -71,6 +71,18 @@ router.get("/:id/verify/:token", async (req, res) => {
   } catch (err) {
     res.status(500).json({ message: "Internal Server Error" });
   }
-})
+});
+
+// Endpoint to fetch all registered users
+router.get("/all", async (req, res) => {
+  try {
+    // Fetch all users from the database
+    const users = await User.find({}, { password: 0, __v: 0 }); // Exclude password and __v fields
+    res.status(200).json(users);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+});  
 
 module.exports = router;

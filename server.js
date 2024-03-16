@@ -63,6 +63,7 @@ app.use('/api/vital', vitalRoutes)
 
 
 app.use('/api/users', userRoutes)
+app.use('/api/users/all', userRoutes)
 app.use('/api/auth', authRoutes)
 
 //connect to db
